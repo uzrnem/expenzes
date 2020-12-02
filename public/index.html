@@ -203,15 +203,15 @@
           axios.post('activities', this.form)
           .then((response) => {
             this.form = {
-              from_account_id: 0,
-              to_account_id: 0,
+              from_account_id: this.form.from_account_id,
+              to_account_id: this.form.to_account_id,
               tag_id: 0,
               amount: null,
               event_date: new Date().toISOString().slice(0,10),
               remarks: null
             }
+            this.reloadAll();
           });
-          this.reloadAll();
           console.log(this.form);
         },
         getTags: function() {
@@ -241,13 +241,11 @@
             axios.get('activities')
             .then((response) => {
               this.activities = response.data;
-              this.$forceUpdate();
             });
           } else {
             axios.get('passbooks/accounts/'+this.transaction.account_id)
             .then((response) => {
               this.passbooks = response.data;
-              this.$forceUpdate();
             });
           }
         },
@@ -260,16 +258,15 @@
           } else if (this.form.to_account_id != 0 && this.form.to_account_id == this.form.from_account_id) {
             this.form.to_account_id = 0
           }
-          axios.get('http://localhost:3000/tags/transactions/'+ this.form.from_account_id + '/' +this.form.to_account_id)
+          axios.get('tags/transactions/'+ this.form.from_account_id + '/' +this.form.to_account_id)
           .then((response) => {
             this.tags = response.data;
-            this.$forceUpdate();
           });
         },
         reloadAll() {
-            console.log('Reload!');
             this.getAccounts();
             this.accountChangeTransaction();
+            console.log('Reloaded..!');
         }
       },
       mounted() {
