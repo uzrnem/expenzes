@@ -19,3 +19,4 @@ Cashback,cashback,credit
 To Parent,to_parent,debit
 Fix By Credit,fix_credit,credit
 Fix By Debit,fix_debit,debit
+Refund,refund,credit

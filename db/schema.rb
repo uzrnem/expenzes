@@ -10,13 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_01_063205) do
+ActiveRecord::Schema.define(version: 2020_12_02_170152) do
 
   create_table "account_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "slug"
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
+    t.index ["name"], name: "index_account_types_on_name", unique: true
+    t.index ["slug"], name: "index_account_types_on_slug", unique: true
   end
 
   create_table "accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -28,6 +30,8 @@ ActiveRecord::Schema.define(version: 2020_12_01_063205) do
     t.datetime "updated_at", precision: 6
     t.boolean "is_frequent"
     t.index ["account_type_id"], name: "index_accounts_on_account_type_id"
+    t.index ["name"], name: "index_accounts_on_name", unique: true
+    t.index ["slug"], name: "index_accounts_on_slug", unique: true
   end
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -65,6 +69,8 @@ ActiveRecord::Schema.define(version: 2020_12_01_063205) do
     t.bigint "transaction_type_id", null: false
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
+    t.index ["name"], name: "index_tags_on_name", unique: true
+    t.index ["slug"], name: "index_tags_on_slug", unique: true
     t.index ["transaction_type_id"], name: "index_tags_on_transaction_type_id"
   end
 
@@ -73,6 +79,8 @@ ActiveRecord::Schema.define(version: 2020_12_01_063205) do
     t.string "slug"
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
+    t.index ["name"], name: "index_transaction_types_on_name", unique: true
+    t.index ["slug"], name: "index_transaction_types_on_slug", unique: true
   end
 
   add_foreign_key "accounts", "account_types"
