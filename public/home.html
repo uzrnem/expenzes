@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Expenze</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./bootstrap.min.css">
+  <script src="./jquery.min.js"></script>
+  <script src="./axios.min.js"></script>
+  <script src="./bootstrap.min.js"></script>
+  <script src="vue-2.6.12.js"></script>
+  <style>
+  body {
+    background-color: #eeeeee;
+  }
+  .card {
+    border: 1px solid #fac16b;
+    /* border-color: #fac16b; */
+    border-radius: 5px;
+    margin: 4px;
+    padding: 8px;
+    font-size: 17px;
+    box-shadow: 0 .5rem 1rem #ffebcc!important;
+    margin-bottom: 10px;
+    background-color: #fffbf5;
+  }
+  p {
+    margin: 0 !important;
+  }
+  .table>thead>tr>th {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .table>tbody>tr>td {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  .pull-left {
+    float: left;
+  }
+  .pull-right {
+    float: right;
+  }
+  .font-14 {
+    font-size: 14px;
+  }
+  .t-italic {
+    font-style: italic;
+  }
+  .t-blue-green {
+    color: #f56038; /*remark */
+  }
+  .t-high-blue { /* date */
+    color: #14606b;
+  }
+  .t-blue{
+    color: #0c3940; /* #0a2f35; */
+  }
+  .t-green{
+    color: #196642;
+  }
+  .t-red{
+    color: #791f06;
+  }
+  .t-orange {
+    color: #4a2d03; /*tag*/
+  }
+  </style>
+</head>
+<body>
+<div class="container" id="transaction-app">
+  <div class="row justify-content-md-center">
+      <div class="col-sm-12">
+        <h2><a class="btn btn-primary" href="index.html">Home</a>&#9;Passbook</h2>
+
+        <div class="custom-control custom-switch">
+          <input type="checkbox" class="custom-control-input" id="customSwitches" v-model="showForTags" @change="getAccounts()">
+          <label class="custom-control-label" for="customSwitches">Show For Tags</label>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div v-if="showForTags == 1">
+          <select v-model="transaction.tag_id" class="form-control" @change="accountChangeTransaction()">
+            <option value=0>Select Tag</option>
+            <option v-for="tag in tags" :value="tag.id">{{ tag.name }}</option>
+          </select>
+        </div>
+        <div v-if="showForTags == 0">
+          <select v-model="transaction.account_id" class="form-control" @change="accountChangeTransaction()">
+            <option value=0>Select Account</option>
+            <option v-for="account in accounts" :value="account.id">{{ account.name + " :" + account.amount }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <button class="btn btn-default" v-on:click="accountChangeTransaction()">Refresh</button>
+      </div>
+      <!-- div class="col-sm-2">
+        <button class="btn btn-default" v-on:click="accountChangeTransaction()">Clear From Date</button>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-group">
+          <input type="date" class="form-control" v-model="transaction.start_date">
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <button class="btn btn-default" v-on:click="accountChangeTransaction()">Clear To Date</button>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-group">
+          <input type="date" class="form-control" v-model="transaction.end_date">
+        </div>
+      </div -->
+      <div class="col-sm-12">
+        <br />
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>From Account</th>
+              <th>To Account</th>
+              <th>Remark</th>
+              <th>
+                <span class="pull-right">Event date</span>
+              </th>
+              <th>
+                <span class="pull-right">Amount</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="passbook in activities">
+              <td>
+                <p v-bind:class="[passbook.transaction_type === 'Income' ? 't-green' : 't-blue']">{{passbook.from_account || 'Credit'}}</p>
+                <span class="pull-right t-blue-green" v-if="passbook.from_account">
+                  <span class="t-orange">{{passbook.fp_previous_balance}} / </span>
+                  <span class="t-blue">{{passbook.fp_balance}}</span>
+                </span>
+              </td>
+              <td>
+                <p v-bind:class="[passbook.transaction_type === 'Expense' ? 't-red' : 't-blue']">{{passbook.to_account || 'Debit'}}</p>
+                <span class="pull-right t-blue-green" v-if="passbook.to_account">
+                  <span class="t-orange">{{passbook.tp_previous_balance}} / </span>
+                  <span class="t-blue">{{passbook.tp_balance}}</span>
+                </span>
+              </td>
+              <td>
+                <p class="t-orange">{{passbook.tag}}</p>
+                <span class="t-blue-green">{{passbook.remarks}}</span>
+              </td>
+              <td>
+                <span class="ml-auto t-high-blue pull-right">{{passbook.event_date}}</span>
+              </td>
+              <td>
+                <span v-if="passbook.transaction_type === 'Transfer'" class="pull-right t-blue">{{passbook.amount}}</span>
+                <span v-else-if="passbook.transaction_type === 'Income'" class="pull-right t-green">+ {{passbook.amount}}</span>
+                <span v-else class="pull-right t-red">- {{passbook.amount}}</span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="5" v-if="activities.length == 0">
+                <p class="t-blue text-center">No Records Found!</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+      <!--div class="col-sm-12">
+        <div class="card text-center" v-for="passbook in activities">
+            <div class="card-header d-flex" style="height: 24px;">
+              <div class="pull-left">
+                <span v-bind:class="[passbook.transaction_type === 'Income' ? 't-green' : 't-blue']">{{passbook.from_account || 'Credit'}}</span>
+                <span class="t-blue-green"> > </span>
+                <span v-bind:class="[passbook.transaction_type === 'Expense' ? 't-red' : 't-blue']">{{passbook.to_account || 'Debit'}}</span>
+              </div>
+              <div v-if="passbook.transaction_type === 'Transfer'" class="pull-right t-blue">{{passbook.amount}}</div>
+              <div v-else-if="passbook.transaction_type === 'Income'" class="pull-right t-green">+ {{passbook.amount}}</div>
+              <div v-else class="pull-right t-red">- {{passbook.amount}}</div>
+            </div>
+            <div class="card-body" style="height: 24px;">
+              <div class="pull-left t-orange">{{passbook.tag}}</div>
+              <div class="ml-auto pull-right">
+                <span class="font-14 t-blue-green">{{passbook.previous_balance}} / </span>
+                <span class="t-blue">{{passbook.balance}}</span>
+              </div>
+            </div>
+            <div class="card-footer text-muted" style="height: 24px;">
+              <div class="pull-left font-14 t-blue-green">{{passbook.remarks}}</div>
+              <div class="ml-auto t-high-blue pull-right">{{passbook.event_date}}</div>
+            </div>
+        </div>
+      </div -->
+  </div>
+</div>
+</body>
+<!-- -->
+  <!-- our javascript -->
+  <script>
+    var app = new Vue({
+      el: '#transaction-app',
+      data: {
+        tags: [],
+        accounts: [],
+        activities: [],
+        passbooks: [],
+        showForTags: true,
+        transaction: {
+          account_id: 0,
+          tag_id:0,
+          start_date: null,
+          end_date: null,
+        }
+      },
+      created() {
+          console.log('Component has been created!');
+      },
+      methods: {
+        getTags: function() {
+          axios.get('tags')
+          .then((response) => {
+            this.tags = response.data;
+          });
+        },
+        getAccounts: function() {
+          axios.get('accounts')
+          .then((response) => {
+            this.accounts = response.data;
+          });
+        },
+        accountChangeTransaction: function() {
+          if (this.showForTags && this.transaction.tag_id != 0) {
+            axios.get('activities/passbook/log', { params: { tag_id: this.transaction.tag_id} })
+            .then((response) => {
+              this.activities = response.data;
+            });
+        } else if ( this.transaction.account_id != 0){
+          axios.get('activities/passbook/log', { params: { account_id: this.transaction.account_id} })
+          .then((response) => {
+            this.activities = response.data;
+          });
+        }
+        },
+        reloadAll() {
+            this.accountChangeTransaction();
+            console.log('Reloaded..!');
+        }
+      },
+      mounted() {
+          console.log('Component has been Mounted!');
+          this.getTags();
+          this.getAccounts();
+      }
+    });
+  </script>
+</html>

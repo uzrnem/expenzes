@@ -100,6 +100,8 @@
           <input type="text" class="form-control" id="remark" placeholder="Enter remark" v-model="form.remarks">
         </div>
         <button class="btn btn-default" v-on:click="processForm()">Submit</button>
+        <a class="btn btn-primary pull-right" href="home.html">Passbook</a>
+
       </div>
     </div>
     <div class="col col-md-6">
@@ -116,6 +118,7 @@
             <button class="btn btn-default" v-on:click="accountChangeTransaction()">Refresh</button>
           </div>
         </div>
+        <br />
         <div v-if="transaction.account_id == 0">
           <div>
             <div class="card text-center" v-for="activity in activities">
@@ -135,6 +138,11 @@
               </div>
               <div class="card-footer text-muted" style="height: 24px;">
                 <div class="ml-auto pull-right t-high-blue">{{activity.event_date}}</div>
+              </div>
+            </div>
+            <div class="card text-center" v-if="activities.length == 0">
+              <div class="card-body" style="height: 24px;">
+                <p class="t-blue text-center">No Records Found!</p>
               </div>
             </div>
           </div>
@@ -162,6 +170,11 @@
                   <div class="pull-left font-14 t-blue-green">{{passbook.remarks}}</div>
                   <div class="ml-auto t-high-blue pull-right">{{passbook.event_date}}</div>
                 </div>
+            </div>
+            <div class="card text-center" v-if="passbooks.length == 0">
+              <div class="card-body" style="height: 24px;">
+                <p class="t-blue text-center">No Records Found!</p>
+              </div>
             </div>
           </div>
         </div>
