@@ -11,7 +11,7 @@ class ActivitiesController < ApplicationController
     LEFT JOIN `transaction_types` ON `transaction_types`.`id` = `act`.`transaction_type_id`
     LEFT JOIN accounts as fa ON fa.id = act.from_account_id
     LEFT JOIN accounts as ta ON ta.id = act.to_account_id
-    ORDER BY `act`.`id` DESC LIMIT 15 -- OFFSET 0"
+    ORDER BY `act`.`event_date` DESC, `act`.`id` DESC LIMIT 15 -- OFFSET 0"
     @activities = ApplicationRecord.connection.exec_query(sql)
 
     render json: @activities

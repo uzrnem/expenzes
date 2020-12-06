@@ -2,7 +2,7 @@ name,slug,transaction_type
 Rent,rent,debit
 Fuel/Light Bill,enegy_bill,debit
 Salary,salary,credit
-Credit Card Bill,credit_bill,debit
+Credit Card Bill,credit_bill,transfer
 Premium,premium,debit
 Monthly Expense,monthly_expense,transfer
 Added to Wallet,add_wallet,transfer
@@ -20,3 +20,5 @@ To Parent,to_parent,debit
 Fix By Credit,fix_credit,credit
 Fix By Debit,fix_debit,debit
 Refund,refund,credit
+Interest,interest,credit
+Transfer,transfer,transfer

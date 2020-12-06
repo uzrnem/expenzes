@@ -11,18 +11,18 @@
   <script src="vue-2.6.12.js"></script>
   <style>
   body {
-    background-color: #d1d8e0;
+    background-color: #eeeeee;
   }
   .card {
-    border: 1px solid;
+    border: 1px solid #fac16b;
+    /* border-color: #fac16b; */
     border-radius: 5px;
     margin: 4px;
     padding: 8px;
     font-size: 17px;
-    border-color: #4b6584;
-    box-shadow: 0 .5rem 1rem #a5b1c2!important;
+    box-shadow: 0 .5rem 1rem #ffebcc!important;
     margin-bottom: 10px;
-    background-color: #fff;
+    background-color: #fffbf5;
   }
   .pull-left {
     float: left;
@@ -36,23 +36,23 @@
   .t-italic {
     font-style: italic;
   }
-  .t-purple {
-    color: #a55eea;
-  }
   .t-blue-green {
-    color: #2bcbba;
+    color: #f56038; /*remark */
   }
-  .t-high-blue {
-    color: #45aaf2;
+  .t-high-blue { /* date */
+    color: #14606b;
   }
   .t-blue{
-    color: #4b7bec;
+    color: #0c3940; /* #0a2f35; */
   }
   .t-green{
-    color: #26de81;
+    color: #196642;
   }
   .t-red{
-    color: #fc5c65;
+    color: #791f06;
+  }
+  .t-orange {
+    color: #4a2d03; /*tag*/
   }
   </style>
 </head>
@@ -130,7 +130,7 @@
                 </div>
               </div>
               <div class="card-body" style="height: 24px;">
-                <div class="pull-left t-purple t-left">{{activity.tag}}</div>
+                <div class="pull-left t-orange t-left">{{activity.tag}}</div>
                 <div class="ml-auto pull-right t-blue-green font-14">{{activity.remarks}}</div>
               </div>
               <div class="card-footer text-muted" style="height: 24px;">
@@ -152,14 +152,14 @@
                   <!-- div class="ml-auto" style="float: right; color:#03506f">{{passbook.amount}}</div -->
                 </div>
                 <div class="card-body" style="height: 24px;">
-                  <div class="pull-left t-purple">{{passbook.comment}}</div>
+                  <div class="pull-left t-orange">{{passbook.comment}}</div>
                   <div class="ml-auto pull-right">
                     <span class="font-14 t-blue-green">{{passbook.previous_balance}} / </span>
                     <span class="t-blue">{{passbook.balance}}</span>
                   </div>
                 </div>
                 <div class="card-footer text-muted" style="height: 24px;">
-                  <div class="pull-left t-blue-green">{{passbook.remarks}}</div>
+                  <div class="pull-left font-14 t-blue-green">{{passbook.remarks}}</div>
                   <div class="ml-auto t-high-blue pull-right">{{passbook.event_date}}</div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :snapshots
   resources :activities
   resources :transaction_types
   resources :passbooks

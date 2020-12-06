@@ -29,7 +29,7 @@ class PassbooksController < ApplicationController
     left join accounts ot on (tt.slug = 'credit' and t.from_account_id = ot.id) or (tt.slug = 'debit' and t.to_account_id = ot.id)
     where p.account_id = "
 
-    @passbook = ApplicationRecord.connection.exec_query(sql+params[:account_id] + ' ORDER BY `p`.`id` DESC LIMIT 15')
+    @passbook = ApplicationRecord.connection.exec_query(sql+params[:account_id] + ' ORDER BY `t`.`event_date` DESC, `p`.`id` DESC LIMIT 15')
     render json: @passbook
   end
 

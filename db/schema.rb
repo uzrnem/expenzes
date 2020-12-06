@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_02_170152) do
+ActiveRecord::Schema.define(version: 2020_12_06_063733) do
 
   create_table "account_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 2020_12_02_170152) do
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
     t.boolean "is_frequent"
+    t.boolean "is_snapshot_disable"
     t.index ["account_type_id"], name: "index_accounts_on_account_type_id"
     t.index ["name"], name: "index_accounts_on_name", unique: true
     t.index ["slug"], name: "index_accounts_on_slug", unique: true
@@ -61,6 +62,19 @@ ActiveRecord::Schema.define(version: 2020_12_02_170152) do
     t.index ["account_id"], name: "index_passbooks_on_account_id"
     t.index ["activity_id"], name: "index_passbooks_on_activity_id"
     t.index ["transaction_type_id"], name: "index_passbooks_on_transaction_type_id"
+  end
+
+  create_table "snapshots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.decimal "saving", precision: 20, scale: 2
+    t.decimal "credit", precision: 20, scale: 2
+    t.decimal "loan", precision: 20, scale: 2
+    t.decimal "invest", precision: 20, scale: 2
+    t.decimal "deposit", precision: 20, scale: 2
+    t.decimal "donate", precision: 20, scale: 2
+    t.decimal "wallet", precision: 20, scale: 2
+    t.date "event_date"
+    t.datetime "created_at", precision: 6
+    t.datetime "updated_at", precision: 6
   end
 
   create_table "tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
