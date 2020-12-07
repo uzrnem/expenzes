@@ -73,11 +73,56 @@ class ActivitiesController < ApplicationController
   # GET /activities
   def log
     data = request.query_parameters
+    conditionTag = nil
+    conditionAccount = nil
+    conditionStartDate = nil
+    conditionEndDate = nil
+    tag_id = data[:tag_id].to_i
+    account_id = data[:account_id].to_i
+    if tag_id > 0
+      conditionTag = 'act.tag_id = '+data[:tag_id]
+    end
+    if account_id > 0
+      conditionAccount = '( act.from_account_id = '+data[:account_id] + ' or act.to_account_id = ' +data[:account_id] + ')'
+    end
+    if !data[:start_date].nil?
+      conditionStartDate = "act.event_date > '"+data[:start_date]+"'"
+    end
+    if !data[:end_date].nil?
+      conditionEndDate = "act.event_date < '"+data[:end_date]+"'"
+    end
+    isStarted = false
     condition = ''
-    if data[:account_id].nil?
-      condition = 'where act.tag_id = '+data[:tag_id]
-    else
-      condition = 'where ( act.from_account_id = '+data[:account_id] + ' or act.to_account_id = ' +data[:account_id] + ')'
+    if !conditionTag.nil?
+      condition = conditionTag
+      isStarted = true
+    end
+    if !conditionAccount.nil?
+      if isStarted == true
+        condition = condition + ' and ' + conditionTag
+      else
+        condition = conditionAccount
+        isStarted = true
+      end
+    end
+    if !conditionStartDate.nil?
+      if isStarted == true
+        condition = condition + ' and ' + conditionStartDate
+      else
+        condition = conditionStartDate
+        isStarted = true
+      end
+    end
+    if !conditionEndDate.nil?
+      if isStarted == true
+        condition = condition + ' and ' + conditionEndDate
+      else
+        condition = conditionEndDate
+        isStarted = true
+      end
+    end
+    if isStarted == true
+      condition = ' WHERE ' + condition
     end
     puts condition
     sql = "SELECT act.id, act.amount, act.event_date, act.remarks, act.created_at, act.updated_at,
