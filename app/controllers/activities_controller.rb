@@ -99,7 +99,7 @@ class ActivitiesController < ApplicationController
     end
     if !conditionAccount.nil?
       if isStarted == true
-        condition = condition + ' and ' + conditionTag
+        condition = condition + ' and ' + conditionAccount
       else
         condition = conditionAccount
         isStarted = true
