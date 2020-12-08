@@ -124,6 +124,8 @@ class ActivitiesController < ApplicationController
     if isStarted == true
       condition = ' WHERE ' + condition
     end
+    limit = data[:page_size].to_i
+    offset = (data[:page_index].to_i - 1 ) * limit
     puts condition
     sql = "SELECT act.id, act.amount, act.event_date, act.remarks, act.created_at, act.updated_at,
              fa.name as from_account, ta.name as to_account, tags.name as tag,
@@ -137,12 +139,16 @@ class ActivitiesController < ApplicationController
         LEFT JOIN accounts as fa ON fa.id = act.from_account_id
         LEFT JOIN accounts as ta ON ta.id = act.to_account_id
         " + condition + "
-        ORDER BY `act`.`event_date` DESC, `act`.`id` DESC LIMIT 100"
+        ORDER BY `act`.`event_date` DESC, `act`.`id` DESC LIMIT " + limit.to_s+ " offset " + offset.to_s
+
+      count = "SELECT count(act.id) as count FROM `activities` as act " + condition
 
     puts sql
-    @activities = ApplicationRecord.connection.exec_query(sql)
+    puts count
+    @result = ApplicationRecord.connection.exec_query(sql)
+    @total = ApplicationRecord.connection.exec_query(count).first
 
-    render json: @activities
+    render json: { list: @result, total: @total['count'] }
   end
 
   private

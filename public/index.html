@@ -100,7 +100,6 @@
           <input type="text" class="form-control" id="remark" placeholder="Enter remark" v-model="form.remarks">
         </div>
         <button class="btn btn-default" v-on:click="processForm()">Submit</button>
-        <a class="btn btn-primary pull-right" href="home.html">Passbook</a>
 
       </div>
     </div>
@@ -114,8 +113,11 @@
               <option v-for="account in accounts" :value="account.id">{{ account.name + " :" + account.amount }}</option>
             </select>
           </div>
-          <div class="col-sm-4">
+          <div class="col-sm-2">
             <button class="btn btn-default" v-on:click="accountChangeTransaction()">Refresh</button>
+          </div>
+          <div class="col-sm-2">
+          <a class="btn btn-primary" href="home.html">Passbook</a>
           </div>
         </div>
         <br />

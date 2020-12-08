@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="./bootstrap.min.css">
+  <link rel="stylesheet" href="./bulma2.css">
   <script src="./jquery.min.js"></script>
   <script src="./axios.min.js"></script>
   <script src="./bootstrap.min.js"></script>
@@ -71,25 +72,25 @@
   </style>
 </head>
 <body>
-<div class="container" id="transaction-app">
-  <div class="row justify-content-md-center">
+  <div class="container" id="transaction-app">
+    <div class="row justify-content-md-center">
       <div class="col-sm-12">
         <h2><a class="btn btn-primary" href="index.html">Home</a>&#9;Passbook</h2>
       </div>
       <div class="col-sm-12">
         <form class="form-inline">
-          <label class="sr-only" for="inlineFormInput">Tag</label>
-          <select v-model="transaction.tag_id" class="form-control mb-3 mr-sm-3 mb-sm-0"
-            @change="getActivities()" placeholder="Select Tag">
-            <option value=0>Select Tag</option>
-            <option v-for="tag in tags" :value="tag.id">{{ tag.name }}</option>
-          </select>
-
           <label class="sr-only" for="inlineFormInputGroup">Username</label>
           <select v-model="transaction.account_id" class="form-control mb-3 mr-sm-3 mb-sm-0"
             @change="getActivities()" placeholder="Select Account">
             <option value=0>Select Account</option>
             <option v-for="account in accounts" :value="account.id">{{ account.name + " :" + account.amount }}</option>
+          </select>
+
+          <label class="sr-only" for="inlineFormInput">Tag</label>
+          <select v-model="transaction.tag_id" class="form-control mb-3 mr-sm-3 mb-sm-0"
+            @change="getActivities()" placeholder="Select Tag">
+            <option value=0>Select Tag</option>
+            <option v-for="tag in tags" :value="tag.id">{{ tag.name }}</option>
           </select>
           <div class="input-group mb-2 mr-sm-2 mb-sm-0">
             <input type="date" class="form-control" v-model="transaction.start_date">
@@ -128,7 +129,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="passbook in activities">
+            <tr v-for="passbook in activities.list">
               <td></td>
               <td>
                 <p v-bind:class="[passbook.transaction_type === 'Income' ? 't-green' : 't-blue']">{{passbook.from_account || 'Credit'}}</p>
@@ -167,8 +168,66 @@
           </tbody>
         </table>
       </div>
+
+      <div class="col-sm-4">
+        <nav class="bulma bulma-nav">
+          <ul class="bulma-nav-ul" style="list-style-type:none;">
+            <li v-bind:class="[transaction.page_size === 10 ? 'nav-item is-current' : 'nav-item']">
+              <a class="bulma-nav-link" @click="transaction.page_size = 10;getActivities()">10</a>
+            </li>
+            <li v-bind:class="[transaction.page_size === 20 ? 'nav-item is-current' : 'nav-item']">
+              <a class="bulma-nav-link" @click="transaction.page_size = 20;getActivities()">20</a>
+            </li>
+            <li v-bind:class="[transaction.page_size === 40 ? 'nav-item is-current' : 'nav-item']">
+              <a class="bulma-nav-link" @click="transaction.page_size = 40;getActivities()">40</a>
+            </li>
+            <li v-bind:class="[transaction.page_size === 80 ? 'nav-item is-current' : 'nav-item']">
+              <a class="bulma-nav-link" @click="transaction.page_size = 80;getActivities()">80</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="col-sm-2">
+      </div>
+
+      <div class="col-sm-6">
+        <nav class="bulma bulma-page">
+          <a class="bulma-page-link" :disabled="transaction.page_index === 1"
+             @click="pagePrevious()">Previous</a>
+             <!-- current != final && final != 1
+             (transaction.page_total - transaction.page_index) > 0
+             page_index: 1,
+             page_size: 10, //transaction.page_index === 1
+             page_total: 0-->
+          <a class="bulma-page-link" :disabled="transaction.page_total === 1 || transaction.page_total === transaction.page_index"
+             @click="pageNext()">Next page</a>
+          <ul class="bulma-page-ul" style="list-style-type:none;">
+            <li v-if="transaction.page_index > 2">
+              <a class="bulma-page-link" @click="changePage(1)">1</a>
+            </li>
+            <li v-if="transaction.page_index > 3"><a class="bulma-page-ellipsis">&hellip;</a></li>
+
+            <li v-if="transaction.page_index > 1">
+              <a class="bulma-page-link" @click="changePage(transaction.page_index - 1)">{{transaction.page_index - 1}}</a>
+            </li>
+            <li class="is-current"><a class="bulma-page-link">{{transaction.page_index}}</a></li>
+            <li v-if="(transaction.page_total - transaction.page_index) > 0">
+              <a class="bulma-page-link" @click="changePage(transaction.page_index + 1)">{{transaction.page_index + 1}}</a>
+            </li>
+
+            <li v-if="(transaction.page_total - transaction.page_index) > 2"><a class="bulma-page-ellipsis">&hellip;</a></li>
+            <li v-if="(transaction.page_total - transaction.page_index) > 1">
+              <a class="bulma-page-link" @click="changePage(transaction.page_total)">{{transaction.page_total}}</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="col-sm-12 text-center">
+        <p style="margin:20px !important; padding:20px !important">Check all your Expenses here!</p>
+      </div>
+    </div>
   </div>
-</div>
 </body>
 <!-- -->
   <!-- our javascript -->
@@ -184,6 +243,9 @@
           tag_id:0,
           start_date: null,
           end_date: null,
+          page_index: 1,
+          page_size: 10,
+          page_total: 0
         }
       },
       created() {
@@ -202,10 +264,33 @@
             this.accounts = response.data;
           });
         },
+        pagePrevious: function()  {
+          if (this.transaction.page_index > 1 ) {
+            this.transaction.page_index --;
+            this.getActivities();
+          }
+        },
+        pageNext: function() {
+          if (this.transaction.page_index != this.transaction.page_total && this.transaction.page_total != 1) {
+            this.transaction.page_index ++;
+            this.getActivities();
+          }
+        },
+        changePage: function(n) {
+          this.transaction.page_index = n;
+          this.getActivities();
+        },
         getActivities: function() {
           axios.get('activities/passbook/log', { params: this.transaction })
           .then((response) => {
             this.activities = response.data;
+            listCount = this.activities.total;
+            pageWeight = this.transaction.page_size;
+            b = listCount % pageWeight;
+            if (b > 0) {
+              listCount = listCount + (pageWeight - b);
+            }
+            this.transaction.page_total = listCount / pageWeight;
           });
         },
         clear() {
@@ -215,6 +300,8 @@
             tag_id:0,
             start_date: null,
             end_date: null,
+            page_index: 1,
+            page_size: 10
           };
           console.log('Reloaded..!');
         }
@@ -223,6 +310,7 @@
           console.log('Component has been Mounted!');
           this.getTags();
           this.getAccounts();
+          this.getActivities();
       }
     });
   </script>

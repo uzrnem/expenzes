@@ -12,8 +12,8 @@ development:
 
 test:
   <<: *default
-  database: expenze_test
+  database: expenze
 
 production:
   <<: *default
-  database: expenze
+  database: expenze_production
