@@ -3,13 +3,13 @@ class AccountsController < ApplicationController
 
   # GET /accounts
   def index
-    @accounts = Account.all
+    @accounts = Account.where(:is_closed => 0)
 
     render json: @accounts
   end
 
   def frequent
-    @accounts = Account.where(is_frequent: 1)
+    @accounts = Account.where(:is_closed => 0, is_frequent: 1)
     render json: @accounts
   end
 

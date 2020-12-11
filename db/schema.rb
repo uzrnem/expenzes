@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_06_063733) do
+ActiveRecord::Schema.define(version: 2020_12_10_194453) do
 
   create_table "account_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 2020_12_06_063733) do
     t.datetime "updated_at", precision: 6
     t.boolean "is_frequent"
     t.boolean "is_snapshot_disable"
+    t.boolean "is_closed", default: false
     t.index ["account_type_id"], name: "index_accounts_on_account_type_id"
     t.index ["name"], name: "index_accounts_on_name", unique: true
     t.index ["slug"], name: "index_accounts_on_slug", unique: true

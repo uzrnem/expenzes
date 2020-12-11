@@ -22,3 +22,6 @@ Fix By Debit,fix_debit,debit
 Refund,refund,credit
 Interest,interest,credit
 Transfer,transfer,transfer
+To Parent,to_parent,debit
+From Parent,from_parent,credit
+Parent,parent,transfer
