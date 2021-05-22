@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Expenze</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./bootstrap.min.css">
+  <script src="./jquery.min.js"></script>
+  <script src="./axios.min.js"></script>
+  <script src="./bootstrap.min.js"></script>
+  <link rel="stylesheet" href="./bulma2.css">
+  <style>
+  body {
+    background-color: #eeeeee;
+  }
+  p {
+    margin: 0 !important;
+  }
+  :root {
+    --padding-x-table: 20px;
+  }
+  .table>tbody>tr>td {
+    padding: 3px 4px 1px 8px;
+  }
+  .pull-left {
+    float: left;
+  }
+  .pull-right {
+    float: right;
+  }
+  .font-14 {
+    font-size: 14px;
+  }
+  .t-italic {
+    font-style: italic;
+  }
+  .t-blue{
+    color: #0c3940; /* #0a2f35; */
+  }
+  .t-red{
+    color: #791f06;
+  }
+  </style>
+</head>
+<body>
+  <div class="container" id="transaction-app">
+    <div class="row justify-content-md-center">
+      <div class="col-sm-12">
+        <h2><a class="btn btn-primary" href="index.html">Home</a>&#9;Passbook</h2>
+      </div>
+      <div class="col-sm-8">
+        <div id="piechart"></div>
+      </div>
+      <div class="col-sm-4">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Type</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id='tbody'>
+            <!--tr>
+              <td colspan="8" v-if="activities.length == 0">
+                <p class="t-blue text-center">No Records Found!</p>
+              </td>
+            </tr-->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script type="text/javascript">
+  // Load google charts
+  google.charts.load('visualization', "1", {'packages':['corechart']}); //current
+  google.charts.setOnLoadCallback(drawChart);
+
+  // Draw the chart and set the chart values
+  function drawChart() {
+    axios.get('accounts/chart/share')
+    .then((response) => {
+      var data = google.visualization.arrayToDataTable(response.data.holding);
+
+      // Optional; add a title and set the width and height of the chart
+      var options = {'title':'My Holdings', 'height':500, //'width':450, //pieHole: 0.4,
+        pieSliceText: 'value',
+        slices: {  1: {offset: 0.2}}
+      };
+
+      // Display the chart inside the <div> element with id="piechart"
+      var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+      chart.draw(data, options);
+
+      var tbody = document.getElementById('tbody');
+      for (let element of response.data.balance) {
+        let row = tbody.insertRow();
+        for (key in element) {
+          let cell = row.insertCell();
+          let span = document.createElement("SPAN");
+          let text = document.createTextNode(element[key]);
+          console.log(key, element[key]);
+          if (key == 'balance') {
+            if (element[key] > 0) {
+              span.className = 't-blue';
+            } else {
+              span.className = 't-red';
+            }
+            span.className += ' pull-right';
+          }
+          span.appendChild(text);
+          cell.appendChild(span);
+        }
+      }
+    });
+  }
+</script>
+</body>
+</html>
+
+
+  <!-- tr v-for="passbook in activities.list">
+    <td></td>
+      <p v-bind:class="[passbook.transaction_type === 'Income' ? 't-green' : 't-blue']">{{passbook.from_account || 'Credit'}}</p>
+      <span class="pull-right t-blue-green" v-if="passbook.from_account">
+        <span class="t-orange">{{passbook.fp_previous_balance}} / </span>
+        <span class="t-blue">{{passbook.fp_balance}}</span>
+      </span>
+    <td>
+  </tr -->

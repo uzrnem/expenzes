@@ -107,7 +107,7 @@
       <h2>Account Transaction</h2>
       <div class="form-group">
         <div class="row">
-          <div class="col-sm-8">
+          <div class="col-sm-6">
             <select v-model="transaction.account_id" class="form-control" @change="accountChangeTransaction()">
               <option value=0>Select Account</option>
               <option v-for="account in accounts" :value="account.id">{{ account.name + " :" + account.amount }}</option>
@@ -117,7 +117,10 @@
             <button class="btn btn-default" v-on:click="accountChangeTransaction()">Refresh</button>
           </div>
           <div class="col-sm-2">
-          <a class="btn btn-primary" href="home.html">Passbook</a>
+            <a class="btn btn-primary" href="home.html">Passbook</a>
+          </div>
+          <div class="col-sm-2">
+            <a class="btn btn-primary" href="chart.html">Chart</a>
           </div>
         </div>
         <br />

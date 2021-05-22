@@ -13,6 +13,40 @@ class AccountsController < ApplicationController
     render json: @accounts
   end
 
+  def share
+#select
+# a.id, a.slug, t.name, a.amount, SUM(a.amount) OVER (PARTITION BY a.account_type_id ) as sum
+#from accounts a
+#left join account_types t on a.account_type_id = t.id
+#where a.amount !=0 and a.is_snapshot_disable = 0
+#order by a.account_type_id, a.slug;
+    holding_balance_sql = "select
+     t.name as 'Account', ABS(SUM(a.amount)) as 'Amount per Account'
+    from accounts a
+    left join account_types t on a.account_type_id = t.id
+    where a.amount !=0 and a.is_snapshot_disable = 0
+    group by a.account_type_id order by t.name='Saving' desc, t.name='Credit' desc, t.name='Wallet' desc,
+    t.name='Deposit' desc, t.name='Loan' desc, t.name='Stocks Equity';";
+    holding_balance = ApplicationRecord.connection.exec_query(holding_balance_sql)
+
+    account_balance_sql = "select a.name as account, t.name as type, a.amount as balance
+    from accounts a
+    left join account_types t on a.account_type_id = t.id where a.amount !=0 and a.is_snapshot_disable = 0
+    order by t.name='Saving' desc, t.name='Credit' desc, t.name='Wallet' desc,
+    t.name='Deposit' desc, t.name='Loan' desc, t.name='Stocks Equity', a.name;"
+    account_balance = ApplicationRecord.connection.exec_query(account_balance_sql)
+
+    array = holding_balance.rows
+    array.each_with_index {|val, index|
+      array[index][1] = val[1].to_f
+      puts "#{val} => #{index}"
+    }
+
+    array.unshift(holding_balance.columns)
+
+    render json: { holding: array, balance: account_balance }
+  end
+
   # GET /accounts/1
   def show
     render json: @account

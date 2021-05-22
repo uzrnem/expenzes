@@ -4,6 +4,6 @@ class Activity < ApplicationRecord
   belongs_to :tag
   has_many :passbooks
   belongs_to :transaction_type
-  validates :amount, :numericality => { :greater_than_or_equal_to => 1 }
+  validates :amount, :numericality => { :greater_than_or_equal_to => 0.01 }
 
 end
