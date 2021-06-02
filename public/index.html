@@ -54,6 +54,9 @@
   .t-orange {
     color: #4a2d03; /*tag*/
   }
+  .balance-amount:before {
+      content: "\20B9" " ";
+  }
   </style>
 </head>
 <body>
@@ -133,8 +136,8 @@
                   <span class="t-blue-green"> > </span>
                   <span v-bind:class="[activity.transaction_type === 'Expense' ? 't-red' : 't-blue']">{{activity.to_account || 'Debit'}}</span>
                 </div>
-                <div class="ml-auto pull-right t-blue">
-                  {{activity.amount}}
+                <div class="ml-auto pull-right t-blue balance-amount">
+                  {{Number(activity.amount).toLocaleString('en')}}
                 </div>
               </div>
               <div class="card-body" style="height: 24px;">

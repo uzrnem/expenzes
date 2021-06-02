@@ -69,14 +69,26 @@
   .t-orange {
     color: #4a2d03; /*tag*/
   }
+  .balance-amount:before {
+    content: "\20B9" " ";
+  }
+  .positive-balance-amount:before {
+    content: "+ " "\20B9" " ";
+  }
+  .negative-balance-amount:before {
+    content: "- " "\20B9" " ";
+  }
   </style>
 </head>
 <body>
   <div class="container" id="transaction-app">
     <div class="row justify-content-md-center">
       <div class="col-sm-12">
-        <h2><a class="btn btn-primary" href="index.html">Home</a>&#9;Passbook</h2>
-        <a class="btn btn-primary" href="chart.html">Chart</a>
+        <h2>
+          <a class="btn btn-primary" href="index.html">Home</a>&#9;
+          <a class="btn btn-primary" href="chart.html">Chart</a>&#9;
+          Passbook
+        </h2>
       </div>
       <div class="col-sm-12">
         <form class="form-inline">
@@ -135,15 +147,15 @@
               <td>
                 <p v-bind:class="[passbook.transaction_type === 'Income' ? 't-green' : 't-blue']">{{passbook.from_account || 'Credit'}}</p>
                 <span class="pull-right t-blue-green" v-if="passbook.from_account">
-                  <span class="t-orange">{{passbook.fp_previous_balance}} / </span>
-                  <span class="t-blue">{{passbook.fp_balance}}</span>
+                  <span class="t-orange balance-amount">{{Number(passbook.fp_previous_balance).toLocaleString('en')}} / </span>
+                  <span class="t-blue balance-amount">{{Number(passbook.fp_balance).toLocaleString('en')}}</span>
                 </span>
               </td>
               <td>
                 <p v-bind:class="[passbook.transaction_type === 'Expense' ? 't-red' : 't-blue']">{{passbook.to_account || 'Debit'}}</p>
                 <span class="pull-right t-blue-green" v-if="passbook.to_account">
-                  <span class="t-orange">{{passbook.tp_previous_balance}} / </span>
-                  <span class="t-blue">{{passbook.tp_balance}}</span>
+                  <span class="t-orange balance-amount">{{Number(passbook.tp_previous_balance).toLocaleString('en')}} / </span>
+                  <span class="t-blue balance-amount">{{Number(passbook.tp_balance).toLocaleString('en')}}</span>
                 </span>
               </td>
               <td></td>
@@ -155,9 +167,9 @@
                 <span class="ml-auto t-high-blue pull-right">{{passbook.event_date}}</span>
               </td>
               <td>
-                <span v-if="passbook.transaction_type === 'Transfer'" class="pull-right t-blue">{{passbook.amount}}</span>
-                <span v-else-if="passbook.transaction_type === 'Income'" class="pull-right t-green">+ {{passbook.amount}}</span>
-                <span v-else class="pull-right t-red">- {{passbook.amount}}</span>
+                <span v-if="passbook.transaction_type === 'Transfer'" class="pull-right t-blue balance-amount">{{Number(passbook.amount).toLocaleString('en')}}</span>
+                <span v-else-if="passbook.transaction_type === 'Income'" class="pull-right t-green positive-balance-amount">{{Number(passbook.amount).toLocaleString('en')}}</span>
+                <span v-else class="pull-right t-red negative-balance-amount">{{Number(passbook.amount).toLocaleString('en')}}</span>
               </td>
               <td></td>
             </tr>
