@@ -98,6 +98,11 @@
             <option value=0>Select Account</option>
             <option v-for="account in accounts" :value="account.id">{{ account.name + " :" + account.amount }}</option>
           </select>
+          <select v-model="transaction.account_key" class="form-control mb-3 mr-sm-3 mb-sm-0"
+            @change="getActivities()" placeholder="Select Account">
+            <option value=0>Select Another Account</option>
+            <option v-for="account in accounts" :value="account.id">{{ account.name + " :" + account.amount }}</option>
+          </select>
 
           <label class="sr-only" for="inlineFormInput">Tag</label>
           <select v-model="transaction.tag_id" class="form-control mb-3 mr-sm-3 mb-sm-0"
@@ -253,6 +258,7 @@
         activities: [],
         transaction: {
           account_id: 0,
+          account_key: 0,
           tag_id:0,
           start_date: null,
           end_date: null,
@@ -310,6 +316,7 @@
           this.activities = [];
           this.transaction = {
             account_id: 0,
+            account_key: 0,
             tag_id:0,
             start_date: null,
             end_date: null,

@@ -26,7 +26,7 @@ class AccountsController < ApplicationController
     left join account_types t on a.account_type_id = t.id
     where a.amount !=0 and a.is_snapshot_disable = 0 and a.is_closed != 1
     group by a.account_type_id order by t.name='Saving' desc, t.name='Credit' desc, t.name='Wallet' desc,
-    t.name='Loan' desc, t.name='Deposit' desc, t.name='Stocks Equity';";
+    t.name='Stocks Equity' desc, t.name='Loan' desc, t.name='Mutual Funds' desc, t.name='Deposit' desc;";
     holding_balance = ApplicationRecord.connection.exec_query(holding_balance_sql)
 
     account_balance_sql = "select a.name as account, t.name as type, a.amount as balance

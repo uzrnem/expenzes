@@ -79,10 +79,14 @@ class ActivitiesController < ApplicationController
     conditionEndDate = nil
     tag_id = data[:tag_id].to_i
     account_id = data[:account_id].to_i
+    account_key = data[:account_key].to_i
     if tag_id > 0
       conditionTag = 'act.tag_id = '+data[:tag_id]
     end
-    if account_id > 0
+    if account_id > 0 and account_key > 0
+      conditionAccount = '( ( act.from_account_id = '+data[:account_id] + ' and act.to_account_id = ' +data[:account_key] + ') or' +
+        '( act.from_account_id = '+data[:account_key] + ' and act.to_account_id = ' +data[:account_id] + ') )'
+    elsif account_id > 0
       conditionAccount = '( act.from_account_id = '+data[:account_id] + ' or act.to_account_id = ' +data[:account_id] + ')'
     end
     if !data[:start_date].nil?
