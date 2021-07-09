@@ -23,6 +23,9 @@
   .table>tbody>tr>td {
     padding: 3px 4px 1px 8px;
   }
+  .navbar {
+    margin-bottom: 1rem !important;
+  }
   .pull-left {
     float: left;
   }
@@ -47,17 +50,39 @@
   </style>
 </head>
 <body>
+  <nav class="navbar navbar-expand-lg  navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Expenze</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="home.html">Passbook</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="chart.html">Chart</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="account.html">Accounts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="expenses.html">Expenses</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
   <div class="container" id="transaction-app">
     <div class="row justify-content-md-center">
-      <div class="col-sm-12">
-        <h2><a class="btn btn-primary" href="index.html">Home</a>&#9;<a class="btn btn-primary" href="home.html">Passbook</a>
-          &#9; CHART</h2>
-      </div>
-      <div class="col-sm-8">
+      <div class="col-sm-7">
         <div id="piechart"></div>
         <div id="barchart_div"></div>
       </div>
-      <div class="col-sm-4">
+      <div class="col-sm-5">
         <table class="table table-striped">
           <thead>
             <tr>
@@ -99,7 +124,7 @@
             }
         },
         slices: { 0: {offset: 0, color: '#ff7c43' },1: { offset: 0.1, color: '#d45087'},
-          2: {color: '#665191'}, 3: {offset: 0.2, color: '#003f5c'}, 4: {color: '#f95d6a'}, 5: {color: '#ffa600'}},
+          2: {color: '#665191'}, 3: {offset: 0.1, color: '#003f5c'}, 4: {color: '#f95d6a'}, 5: {color: '#ffa600'}},
         //slices: { 0: {color: '#ff7c43' },1: { offset: 0.1, color: '#d45087'}, 2: {offset: 0.2, color: '#003f5c'},
         //    3: {color: '#ffa600'}, 4: {color: '#f95d6a'}, 5: {color: '#665191'}},
         //slices: { 0: {color: '#00529b' },1: { color: '#007cc3'}, 2: {offset: 0.2, color: '#377b2b'},
@@ -113,7 +138,7 @@
       var barchart_options = {
         title: 'Holdings against Bills', is3D: false, height: 300, pieSliceText: 'value-and-percentage',
         //slices: { 0: { color: '#dc1a1a' }, 1: { color: '#ffbc00' } }, //pieHole: 0.5, // slices: { 15: {offset: 0.5} },
-        slices: { 0: { color: '#003f5c' }, 1: { color: '#665191' } }, //pieHole: 0.5, // slices: { 15: {offset: 0.5} },
+        slices: { 0: {color: '#d45087'}, 1: { color: '#003f5c' }, 2: { color: '#665191' } }, //pieHole: 0.5, // slices: { 15: {offset: 0.5} },
         chartArea: {'width': '90%', 'height': '60%'}, legend: {
             position: 'labeled',
             labeledValueText: 'both',
@@ -126,7 +151,7 @@
       };
       var barchart = new google.visualization.PieChart(document.getElementById('barchart_div'));
       google.visualization.events.addListener(barchart, 'ready', function(e) {
-        barchart.setSelection([{row:0,column:null}]);
+        barchart.setSelection([{row:1,column:null}]);
       });
       barchart.draw(dataOverall, barchart_options);
 

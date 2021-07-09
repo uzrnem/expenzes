@@ -39,13 +39,17 @@ class TagsController < ApplicationController
   end
 
   def transaction_types
-    transactionType = 'transfer'
-    if params[:from] == "0"
-      transactionType = 'credit'
-    elsif params[:to] == "0"
-      transactionType = 'debit'
+    if !params[:tag_id].nil? && params[:tag_id].to_i > 0
+      render json: Tag.where(:tag_id => params[:tag_id])
+    else
+      transactionType = 'transfer'
+      if params[:from] == "0"
+        transactionType = 'credit'
+      elsif params[:to] == "0"
+        transactionType = 'debit'
+      end
+      render json: Tag.joins(:transaction_type).where(transaction_types: { slug: transactionType}, tag_id: nil)
     end
-    render json: Tag.joins(:transaction_type).where(transaction_types: { slug: transactionType})
   end
 
   private

@@ -4,14 +4,15 @@ class ActivitiesController < ApplicationController
   # GET /activities
   def index
     sql = "SELECT act.id, act.amount, act.event_date, act.remarks, act.created_at, act.updated_at,
-     fa.name as from_account, ta.name as to_account, tags.name as tag,
+     fa.name as from_account, ta.name as to_account, tg.name as tag, s_tg.name as sub_tag,
      transaction_types.name as transaction_type
     FROM `activities` as act
-    LEFT JOIN `tags` ON `tags`.`id` = `act`.`tag_id`
+    LEFT JOIN `tags` tg ON `tg`.`id` = `act`.`tag_id`
+    LEFT JOIN `tags` s_tg ON `s_tg`.`id` = `act`.`sub_tag_id`
     LEFT JOIN `transaction_types` ON `transaction_types`.`id` = `act`.`transaction_type_id`
     LEFT JOIN accounts as fa ON fa.id = act.from_account_id
     LEFT JOIN accounts as ta ON ta.id = act.to_account_id
-    ORDER BY `act`.`event_date` DESC, `act`.`id` DESC LIMIT 15 -- OFFSET 0"
+    ORDER BY `act`.`created_at` DESC, `act`.`event_date` DESC, `act`.`id` DESC LIMIT 5 -- OFFSET 0"
     @activities = ApplicationRecord.connection.exec_query(sql)
 
     render json: @activities
@@ -25,7 +26,7 @@ class ActivitiesController < ApplicationController
   # POST /transactions
   def create
     input_params = params.require(:activity).permit(:from_account_id, :to_account_id,
-    :amount, :event_date, :remarks, :tag_id)
+    :amount, :event_date, :remarks, :tag_id, :sub_tag_id)
     transaction_type = 'transfer'
     if input_params[:from_account_id] == 0 || input_params[:from_account_id] == "0"
       input_params.delete(:from_account_id)
@@ -33,6 +34,9 @@ class ActivitiesController < ApplicationController
     elsif input_params[:to_account_id] == 0 || input_params[:to_account_id] == "0"
       input_params.delete(:to_account_id)
       transaction_type = 'debit'
+    end
+    if input_params[:sub_tag_id] == 0 || input_params[:sub_tag_id] == "0"
+      input_params.delete(:sub_tag_id)
     end
     transactionType = TransactionType.find_by( slug: transaction_type);
     input_params[:transaction_type] = transactionType
@@ -81,7 +85,7 @@ class ActivitiesController < ApplicationController
     account_id = data[:account_id].to_i
     account_key = data[:account_key].to_i
     if tag_id > 0
-      conditionTag = 'act.tag_id = '+data[:tag_id]
+      conditionTag = '( act.tag_id = '+data[:tag_id] + ' or act.sub_tag_id = '+data[:tag_id] + ')'
     end
     if account_id > 0 and account_key > 0
       conditionAccount = '( ( act.from_account_id = '+data[:account_id] + ' and act.to_account_id = ' +data[:account_key] + ') or' +
@@ -132,11 +136,12 @@ class ActivitiesController < ApplicationController
     offset = (data[:page_index].to_i - 1 ) * limit
     puts condition
     sql = "SELECT act.id, act.amount, act.event_date, act.remarks, act.created_at, act.updated_at,
-             fa.name as from_account, ta.name as to_account, tags.name as tag,
+             fa.name as from_account, ta.name as to_account, tg.name as tag, s_tg.name as sub_tag,
              transaction_types.name as transaction_type, fp.previous_balance as fp_previous_balance,
              fp.balance as fp_balance, tp.previous_balance as tp_previous_balance, tp.balance as tp_balance
         FROM `activities` as act
-        LEFT JOIN `tags` ON `tags`.`id` = `act`.`tag_id`
+        LEFT JOIN `tags` tg ON `tg`.`id` = `act`.`tag_id`
+        LEFT JOIN `tags` s_tg ON `s_tg`.`id` = `act`.`sub_tag_id`
         LEFT JOIN `transaction_types` ON `transaction_types`.`id` = `act`.`transaction_type_id`
         LEFT JOIN `passbooks`as fp ON `fp`.`activity_id` = `act`.`id` and act.from_account_id = fp.account_id
         LEFT JOIN `passbooks`as tp ON `tp`.`activity_id` = `act`.`id` and act.to_account_id = tp.account_id
@@ -163,6 +168,6 @@ class ActivitiesController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def activity_params
-      params.require(:activity).permit(:from_account_id, :to_account_id, :tags_id, :amount, :event_date, :remarks, :transaction_types_id)
+      params.require(:activity).permit(:from_account_id, :to_account_id, :tag_id, :sub_tag_id, :amount, :event_date, :remarks, :transaction_types_id)
     end
 end

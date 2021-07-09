@@ -24,6 +24,28 @@
     margin-bottom: 10px;
     background-color: #fffbf5;
   }
+  .card-header {
+    padding: 0rem;
+    background-color: transparent;
+    border-bottom: 0px;
+  }
+  .card-body {
+    padding: 0rem;
+  }
+  .card-footer {
+    padding: 0rem;
+    background-color: transparent;
+    border-top: 0px;
+  }
+  label {
+    margin-bottom: 0rem;
+  }
+  .form-group {
+    margin-bottom: .25rem;
+  }
+  .navbar {
+    margin-bottom: 1rem !important;
+  }
   .pull-left {
     float: left;
   }
@@ -60,14 +82,41 @@
   </style>
 </head>
 <body>
+  <nav class="navbar navbar-expand-lg  navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Expenze</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="index.html">Transaction</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="home.html">Passbook</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="chart.html">Chart</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="account.html">Accounts</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="expenses.html">Expenses</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 <div class="container" id="transaction-app">
   <div class="row justify-content-md-center">
     <div class="col col-md-6">
-      <h2>Add Transaction</h2>
       <div >
-        <div class="custom-control custom-switch">
-          <input type="checkbox" class="custom-control-input" id="customSwitches" v-model="showAllAcounts" @change="getAccounts()">
-          <label class="custom-control-label" for="customSwitches">Show All Accounts</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="customSwitches" v-model="showAllAcounts" @change="getAccounts()">
+          <label class="form-check-label" for="customSwitches">
+            Show All Accounts
+          </label>
         </div>
         <div class="form-group">
           <label for="amount">Account from:</label>
@@ -85,9 +134,16 @@
         </div>
         <div class="form-group">
           <label for="amount">Tag:</label>
-          <select v-model="form.tag_id" class="form-control">
+          <select v-model="form.tag_id" class="form-control" @change="tagChnage(form.tag_id)">
             <option value=0>Select Tag</option>
             <option v-for="tag in tags" :value="tag.id">{{ tag.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="amount">Sub Tag:</label>
+          <select v-model="form.sub_tag_id" class="form-control">
+            <option value=0>Select Sub Tag</option>
+            <option v-for="tag in sub_tags" :value="tag.id">{{ tag.name }}</option>
           </select>
         </div>
         <div class="form-group">
@@ -102,12 +158,11 @@
           <label for="remark">Remark:</label>
           <input type="text" class="form-control" id="remark" placeholder="Enter remark" v-model="form.remarks">
         </div>
-        <button class="btn btn-default" v-on:click="processForm()">Submit</button>
+        <button class="btn btn-primary" v-on:click="processForm()">Submit</button>
 
       </div>
     </div>
     <div class="col col-md-6">
-      <h2>Account Transaction</h2>
       <div class="form-group">
         <div class="row">
           <div class="col-sm-6">
@@ -117,13 +172,7 @@
             </select>
           </div>
           <div class="col-sm-2">
-            <button class="btn btn-default" v-on:click="accountChangeTransaction()">Refresh</button>
-          </div>
-          <div class="col-sm-2">
-            <a class="btn btn-primary" href="home.html">Passbook</a>
-          </div>
-          <div class="col-sm-2">
-            <a class="btn btn-primary" href="chart.html">Chart</a>
+            <button class="btn btn-primary" v-on:click="accountChangeTransaction()">Refresh</button>
           </div>
         </div>
         <br />
@@ -141,7 +190,7 @@
                 </div>
               </div>
               <div class="card-body" style="height: 24px;">
-                <div class="pull-left t-orange t-left">{{activity.tag}}</div>
+                <div class="pull-left t-orange t-left">{{activity.tag}}: {{activity.sub_tag}}</div>
                 <div class="ml-auto pull-right t-blue-green font-14">{{activity.remarks}}</div>
               </div>
               <div class="card-footer text-muted" style="height: 24px;">
@@ -200,6 +249,7 @@
       el: '#transaction-app',
       data: {
         tags: [],
+        sub_tags: [],
         accounts: [],
         activities: [],
         passbooks: [],
@@ -208,6 +258,7 @@
           from_account_id: 0,
           to_account_id: 0,
           tag_id: 0,
+          sub_tag_id: 0,
           amount: null,
           event_date: new Date().toISOString().slice(0,10),
           remarks: null
@@ -227,6 +278,7 @@
               from_account_id: this.form.from_account_id,
               to_account_id: this.form.to_account_id,
               tag_id: 0,
+              sub_tag_id: 0,
               amount: null,
               event_date: new Date().toISOString().slice(0,10),
               remarks: null
@@ -234,12 +286,6 @@
             this.reloadAll();
           });
           console.log(this.form);
-        },
-        getTags: function() {
-          axios.get('tags')
-          .then((response) => {
-            this.tags = response.data;
-          });
         },
         getAccounts: function() {
           if (!this.showAllAcounts) {
@@ -284,6 +330,12 @@
             this.tags = response.data;
           });
         },
+        tagChnage:function (id) {
+          axios.get('tags/transactions/'+ this.form.from_account_id + '/' +this.form.to_account_id+'?tag_id='+id)
+          .then((response) => {
+            this.sub_tags = response.data;
+          });
+        },
         reloadAll() {
             this.getAccounts();
             this.accountChangeTransaction();
@@ -292,7 +344,6 @@
       },
       mounted() {
           console.log('Component has been Mounted!');
-          this.getTags();
           this.reloadAll();
       }
     });

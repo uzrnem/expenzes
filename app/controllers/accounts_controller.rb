@@ -3,8 +3,12 @@ class AccountsController < ApplicationController
 
   # GET /accounts
   def index
-    @accounts = Account.where(:is_closed => 0).order('name ASC')
-
+    @accounts = nil
+    if params[:all_accounts] == 'true'
+      @accounts = Account.order('amount = 0 ASC, name ASC')
+    else
+      @accounts = Account.where(:is_closed => 0).order('name ASC')
+    end
     render json: @accounts
   end
 
@@ -38,10 +42,9 @@ class AccountsController < ApplicationController
     account_balance = ApplicationRecord.connection.exec_query(account_balance_sql)
 
     ccBills = []
-    #ccBills[0]['cat'] = 'feline'
-    #a # => [{"cat"=>"feline"}, {}]
     total = 0.0
     ccIndex = 0
+    loan = 0.0
     ccBills.unshift(['Balance', total])
 
     array = holding_balance.rows
@@ -50,18 +53,27 @@ class AccountsController < ApplicationController
         ccBills.unshift(['CC Bill', 0 - val[1].to_f])
         ccIndex = index
       end
-      total += val[1].to_f
+      if val[0] == 'Deposit' || val[0] == 'Stocks Equity' || val[0] == 'Mutual Funds'
+      elsif val[0] == 'Loan'
+        loan = val[1].to_f
+      else
+        total += val[1].to_f
+      end
       array[index][1] = val[1].to_f
-      puts "#{val} => #{index}"
     }
     array.delete_at(ccIndex)
     ccBills[1][1] = total
+    ccBills.unshift(['Loan', loan])
     ccBills.unshift(holding_balance.columns)
-    puts ccBills
 
     array.unshift(holding_balance.columns)
 
     render json: { holding: array, balance: account_balance, totalBalance: ccBills }
+  end
+
+  # GET /accounts/1
+  def show
+    render json: @account
   end
 
   # GET /accounts/1
@@ -94,6 +106,34 @@ class AccountsController < ApplicationController
     @account.destroy
   end
 
+  # GET /accounts/1
+  def expenses
+    condition = " AND year(event_date) = " + params[:year] + " AND month(event_date) = " + params[:month]
+    if params[:year] == 0 || params[:year] == "0"
+      condition = ""
+    end
+    holding_balance_sql = "SELECT COALESCE(sub.name, tag.name) as tag, SUM(act.amount) as amount
+    FROM `activities` as act
+    LEFT JOIN `tags` tag ON `tag`.`id` = `act`.`tag_id`
+    LEFT JOIN `tags` sub ON `sub`.`id` = `act`.`sub_tag_id`
+    WHERE `act`.`transaction_type_id` = 2 " + condition + "
+    GROUP BY tag.name, sub.name ORDER BY SUM(act.amount) ASC";
+    holding_balance = ApplicationRecord.connection.exec_query(holding_balance_sql)
+
+    months_sql = "SELECT DISTINCT year(event_date) as year, month(event_date) as month, MONTHNAME(event_date) as mon FROM activities " +
+    " WHERE transaction_type_id = 2 ORDER BY year(event_date) DESC, month(event_date) DESC"
+    months = ApplicationRecord.connection.exec_query(months_sql)
+
+    total = 0.0
+    array = holding_balance.rows
+    array.each_with_index {|val, index|
+      total += val[1].to_f
+      array[index][1] = val[1].to_f
+    }
+    array.unshift(holding_balance.columns)
+    render json: { holding: array, expenses: total, months: months }
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_account
@@ -102,6 +142,6 @@ class AccountsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def account_params
-      params.require(:account).permit(:name, :account_types_id, :amount)
+      params.require(:account).permit(:name, :slug, :account_type_id, :amount, :is_frequent, :is_snapshot_disable, :is_closed)
     end
 end

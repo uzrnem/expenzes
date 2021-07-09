@@ -12,5 +12,6 @@ Rails.application.routes.draw do
   get '/accounts/frequent/list', to: 'accounts#frequent'
   get '/activities/passbook/log', to: 'activities#log'
   get '/accounts/chart/share', to: 'accounts#share'
+  get '/accounts/chart/expenses/:year/:month', to: 'accounts#expenses'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end
