@@ -14,8 +14,8 @@ namespace :db do
 	end
 
 	desc "Dumps the database to garage/stocks-{today}.dump"
-	task :stocks do
-    cmd = 'mysqldump -u root -p stock > ~/projects/expenze/garage/stocks-"$(date +%F)".sql'
+	task :stock do
+    cmd = 'mysqldump -u root -p stock > ~/projects/expenze/garage/stock-"$(date +%F)".sql'
     puts cmd
     exec cmd
 	end

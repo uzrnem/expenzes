@@ -127,16 +127,23 @@
             <option value=0>Select Another Account</option>
             <option v-for="account in accounts" :value="account.id">{{ account.name + " :" + account.amount }}</option>
           </select>
-          <select v-model="transaction.tag_id" class="form-control mb-2 mr-sm-2 mb-sm-2"
+          <select v-model="transaction.tag_id" class="form-control mb-3 mr-sm-3 mb-sm-0"
             @change="getActivities()" placeholder="Select Tag">
             <option value=0>Select Tag</option>
             <option v-for="tag in tags" :value="tag.id">{{ tag.name }}</option>
           </select>
-          <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+          <select v-model="transaction.transaction_type_id" class="form-control mb-3 mr-sm-3 mb-sm-0"
+            @change="getActivities()" placeholder="Select Transaction Type">
+            <option value=0>Select Transaction Type</option>
+            <option v-for="tag in transactionTypes" :value="tag.id">{{ tag.name }}</option>
+          </select>
+          <div class="input-group  mb-3 mr-sm-3 mb-sm-0">
+            <label>Start Date</label>
             <input type="date" class="form-control" v-model="transaction.start_date">
           </div>
 
-          <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+          <div class="input-group  mb-3 mr-sm-3 mb-sm-0">
+            <label>End Date</label>
             <input type="date" class="form-control" v-model="transaction.end_date">
           </div>
 
@@ -278,10 +285,12 @@
         tags: [],
         accounts: [],
         activities: [],
+        transactionTypes: [ {id: 1, name: 'Transfer' }, {id: 2, name: 'Expense' }, {id: 3, name: 'Income' }],
         transaction: {
           account_id: 0,
           account_key: 0,
           tag_id:0,
+          transaction_type_id: 0,
           start_date: null,
           end_date: null,
           page_index: 1,
@@ -340,6 +349,7 @@
             account_id: 0,
             account_key: 0,
             tag_id:0,
+            transaction_type_id: 0,
             start_date: null,
             end_date: null,
             page_index: 1,

@@ -78,12 +78,15 @@ class ActivitiesController < ApplicationController
   def log
     data = request.query_parameters
     conditionTag = nil
+    conditionTransactionType = nil
     conditionAccount = nil
     conditionStartDate = nil
     conditionEndDate = nil
     tag_id = data[:tag_id].to_i
     account_id = data[:account_id].to_i
     account_key = data[:account_key].to_i
+    transaction_type_id = data[:transaction_type_id].to_i
+
     if tag_id > 0
       conditionTag = '( act.tag_id = '+data[:tag_id] + ' or act.sub_tag_id = '+data[:tag_id] + ')'
     end
@@ -92,6 +95,9 @@ class ActivitiesController < ApplicationController
         '( act.from_account_id = '+data[:account_key] + ' and act.to_account_id = ' +data[:account_id] + ') )'
     elsif account_id > 0
       conditionAccount = '( act.from_account_id = '+data[:account_id] + ' or act.to_account_id = ' +data[:account_id] + ')'
+    end
+    if transaction_type_id > 0
+      conditionTransactionType = ' act.transaction_type_id = '+ data[:transaction_type_id]
     end
     if !data[:start_date].nil?
       conditionStartDate = "act.event_date > '"+data[:start_date]+"'"
@@ -129,6 +135,15 @@ class ActivitiesController < ApplicationController
         isStarted = true
       end
     end
+    if !conditionTransactionType.nil?
+      if isStarted == true
+        condition = condition + ' and ' + conditionTransactionType
+      else
+        condition = conditionTransactionType
+        isStarted = true
+      end
+    end
+
     if isStarted == true
       condition = ' WHERE ' + condition
     end
